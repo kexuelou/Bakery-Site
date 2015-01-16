@@ -14,5 +14,9 @@ click the "Carrot Cake"
 ###spike CPU
 click the "Lemon Tart"
 
+###Memory Leak
+1. click the "Lemon Tart"
+2. Each request will leak small piece of memory, strerss the site can create memory leak as well.
+
 ###Exception
 click the "Pear Tart"
