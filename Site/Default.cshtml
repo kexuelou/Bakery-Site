@@ -1,7 +1,7 @@
 ﻿@{
     Page.Title = "Home";
 
-    var db = Database.Open("bakery");
+    var db = Database.Open("bakeryAzure");
     var products = db.Query("SELECT * FROM PRODUCTS").ToList();
     var featured = products[new Random().Next(products.Count)];
 }
