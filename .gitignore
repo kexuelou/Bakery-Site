@@ -120,12 +120,12 @@ DocProject/Help/html
 publish/
 
 # Publish Web Output
-*.[Pp]ublish.xml
-*.azurePubxml
+.[Pp]ublish.xml
+.azurePubxml
 ## TODO: Comment the next line if you want to checkin your
 ## web deploy settings but do note that will include unencrypted
 ## passwords
-*.pubxml
+.pubxml
 
 # NuGet Packages Directory
 packages/*
@@ -187,3 +187,6 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+
+#symbo
+*.pdb

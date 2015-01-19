@@ -13,7 +13,7 @@ namespace LazyModule
     {
 
         private static List<HttpContext> historyRequest = new List<HttpContext>();
-
+        private static HttpContext currentContext;
         public void Dispose()
         {
             return;
@@ -38,6 +38,10 @@ namespace LazyModule
             HttpRequest request = app.Context.Request;
 
             Trace.TraceInformation("OnBeginRequest: " + request.Url.ToString());
+
+            if (IsSpecialPage(request))
+                return;
+
             if (request.Url.ToString().ToUpper().Contains("ORDER/1"))
             {
                 System.Threading.Thread.Sleep(15000);
@@ -48,11 +52,16 @@ namespace LazyModule
         {
             HttpApplication app = (HttpApplication)source;
             HttpRequest request = app.Context.Request;
-
+            currentContext = app.Context;
+            
             Trace.TraceInformation("PreSendRequestHeaders: " + request.Url.ToString());
+
+            if (IsSpecialPage(request))
+                return;
+
             if (request.Url.ToString().ToUpper().Contains("ORDER/2"))
             {
-                spinCPU();
+                Woops();
             }
         }
 
@@ -60,10 +69,13 @@ namespace LazyModule
         {
             HttpApplication app = (HttpApplication)source;
             HttpRequest request = app.Context.Request;
-
+            
             Trace.TraceInformation("OnPreRequestHandlerExecute: " + request.Url.ToString());
 
-            if (request.Url.ToString().ToUpper().Contains("ORDER/6") && !request.Url.ToString().ToUpper().Contains("ERROR"))
+            if (IsSpecialPage(request))
+                return;
+
+            if (request.Url.ToString().ToUpper().Contains("ORDER/6"))
             {
                 throw new System.SystemException("woops, I dare to reject you!");
             }
@@ -80,7 +92,7 @@ namespace LazyModule
             Trace.TraceInformation("OnEndRequest: " + app.Context.Request.Url.ToString());
         }
 
-        private void spinCPU()
+        private void Woops()
         {
             for (int i = 0; i < 100; i++)
             {
@@ -90,8 +102,14 @@ namespace LazyModule
 
         private int Fib(int n)
         {
+            historyRequest.Add(currentContext);
             if (n < 3) return 1;
             return Fib(n - 1) + Fib(n-2);
+        }
+
+        private bool IsSpecialPage(HttpRequest request)
+        {
+            return request.Url.ToString().ToUpper().Contains("ERROR");
         }
 
 
