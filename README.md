@@ -20,3 +20,5 @@ click the "Lemon Tart"
 
 ###Exception
 click the "Pear Tart"
+
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
