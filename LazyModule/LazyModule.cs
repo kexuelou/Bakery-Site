@@ -77,29 +77,24 @@ namespace LazyModule
 
             if (request.Url.ToString().ToUpper().Contains("ORDER/6"))
             {
-                throw new System.SystemException("woops, out of stock!");
+                throw new System.SystemException("woops, I dare to reject you!");
             }
         }
 
         private void OnEndRequest(Object source, EventArgs e)
         {
             HttpApplication app = (HttpApplication)source;
-            LeakContext(app.Context);
+            for (int i = 0; i < 200; i++)
+            {
+                historyRequest.Add(app.Context);
+            }
             
             Trace.TraceInformation("OnEndRequest: " + app.Context.Request.Url.ToString());
         }
 
-        private void LeakContext(HttpContext context)
-        {
-            for (int i = 0; i < 5000; i++)
-            {
-                historyRequest.Add(context);
-            }
-            Trace.TraceInformation("LeakContext: " + context.Request.Url.ToString());
-        }
         private void Woops()
         {
-            //for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++)
             {
                 Fib(40);
             }
@@ -107,6 +102,7 @@ namespace LazyModule
 
         private int Fib(int n)
         {
+            historyRequest.Add(currentContext);
             if (n < 3) return 1;
             return Fib(n - 1) + Fib(n-2);
         }
