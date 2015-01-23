@@ -26,6 +26,7 @@ namespace LazyModule
             context.BeginRequest += new EventHandler(PreSendRequestHeaders);
 
             context.PreSendRequestHeaders += new EventHandler(OnBeginRequest);
+            context.PreSendRequestContent += new EventHandler(OnSendRequestContent);
 
             //System.Diagnostics.Trace.Listeners.Clear();
             //WAWSListener listener = new WAWSListener();
@@ -89,9 +90,28 @@ namespace LazyModule
             Trace.TraceInformation("OnEndRequest: " + app.Context.Request.Url.ToString());
         }
 
+        private void OnSendRequestContent(Object source, EventArgs e)
+        {
+            HttpApplication app = (HttpApplication)source;
+            HttpRequest request = app.Context.Request;
+            currentContext = app.Context;
+
+            Trace.TraceInformation("OnSendRequestContent: " + request.Url.ToString());
+
+            if (IsSpecialPage(request))
+                return;
+
+            if (request.Url.ToString().ToUpper().Contains("ORDER/3"))
+            {
+                for (int i = 0; i < 200; i++)
+                    LeakContext(app.Context);
+            }
+        }
+
+
         private void LeakContext(HttpContext context)
         {
-            for (int i = 0; i < 5000; i++)
+            for (int i = 0; i < 500; i++)
             {
                 historyRequest.Add(context);
             }
@@ -128,13 +148,6 @@ namespace LazyModule
         //    }
         //}
 
-        //private void OnSendReuqestHeaders(Object source, EventArgs e)
-        //{
-        //    HttpApplication curApp = (HttpApplication)source;
-        //    HttpResponse response = curApp.Context.Response;
-        //    response.StatusCode = 500;
-        //    response.SubStatusCode = 19;
 
-        //}
     }
 }
