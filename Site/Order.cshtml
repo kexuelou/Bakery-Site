@@ -8,12 +8,12 @@
 
     var db = Database.Open("bakery");
     var productId = UrlData[0].AsInt();
+
     var product = db.QuerySingle("SELECT * FROM PRODUCTS WHERE ID = @0", productId);
 
     if (product == null) {
         Response.Redirect("~/");
     }
-
     // Setup validation
     Validation.RequireField("orderEmail", "You must specify an email address.");
     Validation.RequireField("orderShipping", "You must specify a shipping address.");
@@ -33,19 +33,34 @@
         }
         body += "Your total is $" + product.Price * Request["orderQty"].AsDecimal() +".<br/>";
         body += "We will contact you if we have questions about your order.  Thanks!<br/>";
+        
+        //
+        if(App.D.ContainsKey(product.Name)){
+            for(int i=1;i<10000000;i++){
+                 App.D[product.Name]++;
+                 App.D[product.Name]--;
+            }
+            App.D[product.Name]++;
+        }else{
+            for(int i=1;i<10000000;i++){
+                App.D.Add(product.Name,1);
+                App.D.Remove(product.Name);
+            }
+            App.D.Add(product.Name,1);
+        }
+        
 
         //SMTP Configuration for Hotmail
         WebMail.SmtpServer = "smtp.live.com";
         WebMail.SmtpPort = 25;
         WebMail.EnableSsl = true;
-
+        
         //Enter your Hotmail credentials for UserName/Password and a "From" address for the e-mail
         WebMail.UserName = "";
         WebMail.Password = "";
         WebMail.From = "";
-
         if (WebMail.UserName.IsEmpty() || WebMail.Password.IsEmpty() || WebMail.From.IsEmpty()) {
-            Response.Redirect("~/OrderSuccess?NoEmail=1");
+           Response.Redirect("~/OrderSuccess");
         } 
         else {
             try {
@@ -66,7 +81,10 @@
 <h1>Place Your Order: @product.Name</h1>
 <form action="" method="post">
     @Html.ValidationSummary(excludeFieldErrors: true)
-
+    <p>My Cart:</P>
+    @foreach(var x in App.D){
+        <p>@x.Key,@x.Value</p>
+    }
     <fieldset class="no-legend">
         <legend>Place Your Order</legend>
         <img class="product-image order-image" src="~/Images/Products/Thumbnails/@product.ImageName" alt="Image of @product.Name"/>
